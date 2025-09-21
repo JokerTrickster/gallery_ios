@@ -5,54 +5,22 @@
 ## Project Information
 - **Repository**: JokerTrickster/gallery_ios
 - **GitHub URL**: https://github.com/JokerTrickster/gallery_ios
-- **Project**: gallery_ios
-
-## CCPM Integration (Claude Code PM)
-This project uses CCPM for structured project management with AI agents. 
-
-### Quick Commands:
-- `/pm:prd-new feature-name` - Create new Product Requirements Document
-- `/pm:prd-parse feature-name` - Convert PRD to implementation plan
-- `/pm:epic-oneshot feature-name` - Decompose and sync to GitHub issues
-- `/pm:issue-start 1234` - Start working on GitHub issue with specialized agent
-- `/pm:next` - Get next priority task with context
-- `/pm:status` - Overall project dashboard
-
-## USE SUB-AGENTS FOR CONTEXT OPTIMIZATION
-
-### 1. Always use the file-analyzer sub-agent when asked to read files.
-The file-analyzer agent is an expert in extracting and summarizing critical information from files, particularly log files and verbose outputs. It provides concise, actionable summaries that preserve essential information while dramatically reducing context usage.
-
-### 2. Always use the code-analyzer sub-agent when asked to search code, analyze code, research bugs, or trace logic flow.
-
-The code-analyzer agent is an expert in code analysis, logic tracing, and vulnerability detection. It provides concise, actionable summaries that preserve essential information while dramatically reducing context usage.
-
-### 3. Always use the test-runner sub-agent to run tests and analyze the test results.
-
-Using the test-runner agent ensures:
-
-- Full test output is captured for debugging
-- Main conversation stays clean and focused
-- Context usage is optimized
-- All issues are properly surfaced
-- No approval dialogs interrupt the workflow
+- **Project**: iOS Gallery Cloud Sync App
 
 ## Philosophy
 
-### Error Handling
+### iOS Development
 
-- **Fail fast** for critical configuration (missing text model)
-- **Log and continue** for optional features (extraction model)
-- **Graceful degradation** when external services unavailable
-- **User-friendly messages** through resilience layer
+- **Follow Apple HIG**: Adhere to Apple Human Interface Guidelines
+- **Use native frameworks**: Prefer UIKit/SwiftUI, Photos framework, CloudKit over third-party solutions
+- **Memory management**: Proper use of ARC, avoid retain cycles
+- **Performance**: Optimize for smooth scrolling, lazy loading for large photo collections
 
-### Testing
+### Architecture
 
-- Always use the test-runner agent to execute tests.
-- Do not use mock services for anything ever.
-- Do not move on to the next test until the current test is complete.
-- If the test fails, consider checking if the test is structured correctly before deciding we need to refactor the codebase.
-- Tests to be verbose so we can use them for debugging.
+- **MVVM Pattern**: Use Model-View-ViewModel architecture
+- **Coordinator Pattern**: Use coordinators for navigation flow
+- **Dependency Injection**: Use proper dependency injection for testability
 
 ## Tone and Behavior
 
@@ -76,5 +44,7 @@ Using the test-runner agent ensures:
 - NO CHEATER TESTS : test must be accurate, reflect real usage and be designed to reveal flaws. No useless tests! Design tests to be verbose so we can use them for debuging.
 - NO INCONSISTENT NAMING - read existing codebase naming patterns.
 - NO OVER-ENGINEERING - Don't add unnecessary abstractions, factory patterns, or middleware when simple functions would work. Don't think "enterprise" when you need "working"
-- NO MIXED CONCERNS - Don't put validation logic inside API handlers, database queries inside UI components, etc. instead of proper separation
-- NO RESOURCE LEAKS - Don't forget to close database connections, clear timeouts, remove event listeners, or clean up file handles
+- NO MIXED CONCERNS - Don't put validation logic inside view controllers, network calls inside UI components, etc. instead of proper separation
+- NO RESOURCE LEAKS - Don't forget to close file handles, remove observers, or clean up delegates
+- ALWAYS COMMIT AND PUSH - After completing any implementation work, always commit changes and push to GitHub
+- ALWAYS LOG TASKS - Every task execution must be logged to .claude/tasks folder with detailed context, status, and results for continuity and web display
