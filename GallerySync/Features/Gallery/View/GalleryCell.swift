@@ -21,26 +21,6 @@ class GalleryCell: UICollectionViewCell {
         return view
     }()
 
-    private let selectionIndicator: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .systemBlue
-        view.layer.cornerRadius = 12
-        view.layer.borderWidth = 2
-        view.layer.borderColor = UIColor.white.cgColor
-        view.isHidden = true
-        return view
-    }()
-
-    private let checkmarkImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.image = UIImage(systemName: "checkmark")
-        imageView.tintColor = .white
-        imageView.contentMode = .scaleAspectFit
-        return imageView
-    }()
-
     private let progressIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .medium)
         indicator.translatesAutoresizingMaskIntoConstraints = false
@@ -61,9 +41,7 @@ class GalleryCell: UICollectionViewCell {
     private func setupUI() {
         contentView.addSubview(imageView)
         contentView.addSubview(syncStatusView)
-        contentView.addSubview(selectionIndicator)
         contentView.addSubview(progressIndicator)
-        selectionIndicator.addSubview(checkmarkImageView)
 
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -71,49 +49,18 @@ class GalleryCell: UICollectionViewCell {
             imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
 
-            syncStatusView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5),
-            syncStatusView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
-            syncStatusView.widthAnchor.constraint(equalToConstant: 12),
-            syncStatusView.heightAnchor.constraint(equalToConstant: 12),
-
-            selectionIndicator.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5),
-            selectionIndicator.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
-            selectionIndicator.widthAnchor.constraint(equalToConstant: 24),
-            selectionIndicator.heightAnchor.constraint(equalToConstant: 24),
-
-            checkmarkImageView.centerXAnchor.constraint(equalTo: selectionIndicator.centerXAnchor),
-            checkmarkImageView.centerYAnchor.constraint(equalTo: selectionIndicator.centerYAnchor),
-            checkmarkImageView.widthAnchor.constraint(equalToConstant: 16),
-            checkmarkImageView.heightAnchor.constraint(equalToConstant: 16),
+            syncStatusView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
+            syncStatusView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -4),
+            syncStatusView.widthAnchor.constraint(equalToConstant: 8),
+            syncStatusView.heightAnchor.constraint(equalToConstant: 8),
 
             progressIndicator.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             progressIndicator.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ])
     }
 
-    func configure(with item: GalleryItem, isSelectionMode: Bool = false) {
-        // Update sync status
+    func configure(with item: GalleryItem) {
         updateSyncStatus(item.syncStatus)
-
-        // Update selection state
-        selectionIndicator.isHidden = !isSelectionMode
-        if isSelectionMode {
-            if item.isSelected {
-                selectionIndicator.backgroundColor = .systemBlue
-                checkmarkImageView.isHidden = false
-            } else {
-                selectionIndicator.backgroundColor = .clear
-                selectionIndicator.layer.borderColor = UIColor.white.cgColor
-                checkmarkImageView.isHidden = true
-            }
-        }
-
-        // Add selection overlay
-        if isSelectionMode && !item.isSelected {
-            imageView.alpha = 0.7
-        } else {
-            imageView.alpha = 1.0
-        }
 
         if let thumbnail = item.thumbnail {
             imageView.image = thumbnail
