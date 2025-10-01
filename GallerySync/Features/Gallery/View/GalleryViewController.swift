@@ -9,9 +9,15 @@ class GalleryViewController: UIViewController {
 
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: 100, height: 100)
-        layout.minimumInteritemSpacing = 5
-        layout.minimumLineSpacing = 5
+        let spacing: CGFloat = 2
+        let itemsPerRow: CGFloat = 3
+        let totalSpacing = spacing * (itemsPerRow + 1)
+        let itemWidth = (UIScreen.main.bounds.width - totalSpacing) / itemsPerRow
+
+        layout.itemSize = CGSize(width: itemWidth, height: itemWidth)
+        layout.minimumInteritemSpacing = spacing
+        layout.minimumLineSpacing = spacing
+        layout.sectionInset = UIEdgeInsets(top: spacing, left: spacing, bottom: spacing, right: spacing)
 
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -22,42 +28,17 @@ class GalleryViewController: UIViewController {
         return collectionView
     }()
 
-    private lazy var selectButton: UIBarButtonItem = {
-        UIBarButtonItem(title: "Select", style: .plain, target: self, action: #selector(selectButtonTapped))
-    }()
-
     private lazy var uploadButton: UIBarButtonItem = {
-        UIBarButtonItem(title: "Upload", style: .plain, target: self, action: #selector(uploadButtonTapped))
+        UIBarButtonItem(image: UIImage(systemName: "icloud.and.arrow.up"), style: .plain, target: self, action: #selector(uploadButtonTapped))
     }()
 
     private lazy var downloadButton: UIBarButtonItem = {
-        UIBarButtonItem(title: "Download", style: .plain, target: self, action: #selector(downloadButtonTapped))
-    }()
-
-    private lazy var syncButton: UIBarButtonItem = {
-        UIBarButtonItem(title: "Sync", style: .plain, target: self, action: #selector(syncButtonTapped))
+        UIBarButtonItem(image: UIImage(systemName: "icloud.and.arrow.down"), style: .plain, target: self, action: #selector(downloadButtonTapped))
     }()
 
     private lazy var settingsButton: UIBarButtonItem = {
-        UIBarButtonItem(title: "Settings", style: .plain, target: self, action: #selector(settingsButtonTapped))
+        UIBarButtonItem(image: UIImage(systemName: "gearshape"), style: .plain, target: self, action: #selector(settingsButtonTapped))
     }()
-
-    private lazy var cancelButton: UIBarButtonItem = {
-        UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(cancelButtonTapped))
-    }()
-
-    private lazy var selectAllButton: UIBarButtonItem = {
-        UIBarButtonItem(title: "Select All", style: .plain, target: self, action: #selector(selectAllButtonTapped))
-    }()
-
-    private lazy var toolbar: UIToolbar = {
-        let toolbar = UIToolbar()
-        toolbar.translatesAutoresizingMaskIntoConstraints = false
-        toolbar.isHidden = true
-        return toolbar
-    }()
-
-    private var isSelectionMode = false
 
     init(viewModel: GalleryViewModel) {
         self.viewModel = viewModel
@@ -78,21 +59,14 @@ class GalleryViewController: UIViewController {
         title = "Gallery"
         view.backgroundColor = .systemBackground
 
-        navigationItem.rightBarButtonItems = [settingsButton, downloadButton, uploadButton, selectButton]
-
-        view.addSubview(toolbar)
-        updateToolbarItems()
+        navigationItem.rightBarButtonItems = [settingsButton, downloadButton, uploadButton]
 
         view.addSubview(collectionView)
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
-            collectionView.bottomAnchor.constraint(equalTo: toolbar.topAnchor),
-
-            toolbar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            toolbar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            toolbar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
     }
 
@@ -110,84 +84,19 @@ class GalleryViewController: UIViewController {
                 self?.updateButtonStates(isLoading: isLoading)
             }
             .store(in: &cancellables)
-
-        viewModel.$isSelectionMode
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] isSelectionMode in
-                self?.updateSelectionMode(isSelectionMode)
-            }
-            .store(in: &cancellables)
-
-        viewModel.$selectedItemsCount
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] count in
-                self?.updateToolbarItems(selectedCount: count)
-            }
-            .store(in: &cancellables)
     }
 
     private func updateButtonStates(isLoading: Bool) {
         uploadButton.isEnabled = !isLoading
         downloadButton.isEnabled = !isLoading
-        selectButton.isEnabled = !isLoading
-        syncButton.isEnabled = !isLoading
-    }
-
-    private func updateSelectionMode(_ isSelectionMode: Bool) {
-        self.isSelectionMode = isSelectionMode
-
-        if isSelectionMode {
-            navigationItem.leftBarButtonItem = cancelButton
-            navigationItem.rightBarButtonItems = [selectAllButton]
-            toolbar.isHidden = false
-        } else {
-            navigationItem.leftBarButtonItem = nil
-            navigationItem.rightBarButtonItems = [settingsButton, downloadButton, uploadButton, selectButton]
-            toolbar.isHidden = true
-        }
-
-        collectionView.allowsMultipleSelection = isSelectionMode
-        collectionView.reloadData()
-    }
-
-    private func updateToolbarItems(selectedCount: Int = 0) {
-        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        let selectedLabel = UIBarButtonItem(title: "\(selectedCount) Selected", style: .plain, target: nil, action: nil)
-        selectedLabel.isEnabled = false
-
-        let uploadSelectedButton = UIBarButtonItem(title: "Upload Selected", style: .plain, target: self, action: #selector(uploadSelectedButtonTapped))
-        uploadSelectedButton.isEnabled = selectedCount > 0
-
-        toolbar.setItems([selectedLabel, flexibleSpace, uploadSelectedButton], animated: false)
-    }
-
-    @objc private func selectButtonTapped() {
-        viewModel.toggleSelectionMode()
-    }
-
-    @objc private func cancelButtonTapped() {
-        viewModel.exitSelectionMode()
-    }
-
-    @objc private func selectAllButtonTapped() {
-        viewModel.selectAllItems()
-        collectionView.reloadData()
     }
 
     @objc private func uploadButtonTapped() {
         viewModel.uploadAllItems()
     }
 
-    @objc private func uploadSelectedButtonTapped() {
-        viewModel.uploadSelectedItems()
-    }
-
     @objc private func downloadButtonTapped() {
         viewModel.downloadFromCloud()
-    }
-
-    @objc private func syncButtonTapped() {
-        coordinator?.showCloudSync()
     }
 
     @objc private func settingsButtonTapped() {
@@ -203,32 +112,13 @@ extension GalleryViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "GalleryCell", for: indexPath) as! GalleryCell
         let item = viewModel.galleryItems[indexPath.item]
-        cell.configure(with: item, isSelectionMode: isSelectionMode)
+        cell.configure(with: item)
         return cell
     }
 }
 
 extension GalleryViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if isSelectionMode {
-            viewModel.toggleItemSelection(at: indexPath.item)
-            collectionView.reloadItems(at: [indexPath])
-        } else {
-            let item = viewModel.galleryItems[indexPath.item]
-            // Handle item preview/detail view
-            collectionView.deselectItem(at: indexPath, animated: true)
-        }
-    }
-
-    func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-
-    func collectionView(_ collectionView: UICollectionView, shouldDeselectItemAt indexPath: IndexPath) -> Bool {
-        if isSelectionMode {
-            viewModel.toggleItemSelection(at: indexPath.item)
-            collectionView.reloadItems(at: [indexPath])
-        }
-        return !isSelectionMode
+        collectionView.deselectItem(at: indexPath, animated: true)
     }
 }
