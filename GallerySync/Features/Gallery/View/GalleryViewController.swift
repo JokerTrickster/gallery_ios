@@ -57,6 +57,16 @@ class GalleryViewController: UIViewController {
         return toolbar
     }()
 
+    private lazy var developerLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "Developer: JokerTrickster"
+        label.textAlignment = .center
+        label.font = .systemFont(ofSize: 12, weight: .regular)
+        label.textColor = .secondaryLabel
+        return label
+    }()
+
     private var isSelectionMode = false
 
     init(viewModel: GalleryViewModel) {
@@ -80,12 +90,18 @@ class GalleryViewController: UIViewController {
 
         navigationItem.rightBarButtonItems = [settingsButton, downloadButton, uploadButton, selectButton]
 
+        view.addSubview(developerLabel)
         view.addSubview(toolbar)
         updateToolbarItems()
 
         view.addSubview(collectionView)
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            developerLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+            developerLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            developerLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+            developerLabel.heightAnchor.constraint(equalToConstant: 20),
+
+            collectionView.topAnchor.constraint(equalTo: developerLabel.bottomAnchor, constant: 8),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
             collectionView.bottomAnchor.constraint(equalTo: toolbar.topAnchor),
