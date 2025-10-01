@@ -8,6 +8,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
+        // Test log for PR creation check
+        print("🧪 [PR TEST] AppDelegate initialized - Testing PR creation workflow")
+
         window = UIWindow(frame: UIScreen.main.bounds)
 
         let navigationController = UINavigationController()
