@@ -150,7 +150,7 @@ private let baseURL = "https://api.yourcloudservice.com"
 ## 👨‍💻 개발자
 
 - **JokerTrickster** - *Initial work* - [GitHub](https://github.com/JokerTrickster)
-- **logan** - *Developer*
+- **joker** - *Developer*
 
 ---
 
